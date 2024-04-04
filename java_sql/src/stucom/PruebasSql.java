@@ -9,21 +9,26 @@ import java.sql.Statement;
 public class PruebasSql {
 
 	public static void main(String[] args) throws SQLException {
-		String URL = "jdbc:mysql://172.28.0.191:3306/video?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC";
+		/*String URL = "jdbc:mysql://localhost:8889/mobil?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC";*/
+		String URL = "jdbc:postgresql://localhost/mobile";
 		
-		String nuevo = "INSERT INTO cli VALUES('30', 'Carlos', 'AndresAgudelo' , 'Medellin', 'Colombia')";
-		String consulta = "SELECT * FROM peliculas";
+		/*String nuevo = "INSERT INTO cli VALUES('30', 'Carlos', 'AndresAgudelo' , 'Medellin', 'Colombia')";*/
+		String consulta = "SELECT * FROM models";
+	
 		
-		Connection conexion = DriverManager.getConnection(URL, "usuario1", "usuario1");
+		
+		Connection conexion = DriverManager.getConnection(URL, "postgres", "1111");
 		Statement comando = conexion.createStatement();
 		ResultSet rs = comando.executeQuery(consulta);
 		
-		System.out.println("Num_Pel TITULO");
+		System.out.println("ID FABRICANTE MODELO PRECIO");
 		System.out.println("-------------");
 		while(rs.next()) {
-			int numPel = rs.getInt(1);
-			String titulo = rs.getString(2);
-			System.out.println(numPel + " - " + titulo);
+			int id = rs.getInt(1);
+			String fabricante = rs.getString(2);
+			String modelo = rs.getString(3);
+			double precio = rs.getDouble(4);
+			System.out.println(id + " - " + fabricante+ " - " + modelo + " - " + precio);
 		}
 		
 		comando.close();
