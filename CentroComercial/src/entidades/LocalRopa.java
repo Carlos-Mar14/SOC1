@@ -7,7 +7,5 @@ public class LocalRopa extends Local{
 		super(name, schedule, employee, squareMeter);
 		
 	}
-	
-	
 
 }
