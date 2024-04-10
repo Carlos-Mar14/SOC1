@@ -1,0 +1,56 @@
+package entidades;
+
+public class TelMovil {
+	
+	//atributos
+	private long  id;
+	private String fabricante, modelo;
+	private double precio;
+	
+	
+	//Constructor
+	public TelMovil(long id, String fabricante, String modelo, double precio) {
+		this.id = id;
+		this.fabricante = fabricante;
+		this.modelo = modelo;
+		this.precio = precio;
+	}
+	
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
+	public String getModelo() {
+		return modelo;
+	}
+
+	public void setModelo(String modelo) {
+		this.modelo = modelo;
+	}
+
+	public double getPrecio() {
+		return precio;
+	}
+
+	public void setPrecio(double precio) {
+		this.precio = precio;
+	}
+
+	public String getFabricante() {
+		return fabricante;
+	}
+
+	public void setFabricante(String fabricante) {
+		this.fabricante = fabricante;
+	}
+	
+	//ToString
+		@Override
+		public String toString() {
+			return "id: " + id + " \nabricante: " + fabricante + "\nmodelo: " + modelo + "\nprecio: " + precio + "\n--------------------";
+		}
+}
