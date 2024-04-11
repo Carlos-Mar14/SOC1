@@ -15,7 +15,7 @@ public class TelMovil {
 		this.modelo = modelo;
 		this.precio = precio;
 	}
-	
+	 //Metodos Guetters and Setters
 	public long getId() {
 		return id;
 	}
@@ -48,7 +48,7 @@ public class TelMovil {
 		this.fabricante = fabricante;
 	}
 	
-	//ToString
+	//ToString, que 
 		@Override
 		public String toString() {
 			return "id: " + id + " \nabricante: " + fabricante + "\nmodelo: " + modelo + "\nprecio: " + precio + "\n--------------------";
