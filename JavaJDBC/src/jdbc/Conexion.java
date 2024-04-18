@@ -12,6 +12,13 @@ public class Conexion {
 	//Este método permite establecer la cadena de conexión con la base 
 	//de datos y así poder posteriormente crear una conexión.
 	public static void setURL(String dburl) {
+		try {
+			Class.forName("com.mysql.cj.jdbc.Driver");
+
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		
 	    final String fabricante = "mysql", servidor = "localhost", puerto = "8889";
 	    final String db = "libros";
 	    final String opciones = "allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC";
