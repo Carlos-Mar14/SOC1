@@ -22,9 +22,8 @@ public class Triangulo {
 	}
 
 	public void setBase(int base) {
-		this.base = base;
 	}
-
+	
 	public int getLado1() {
 		return lado1;
 	}

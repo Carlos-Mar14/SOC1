@@ -1,60 +1,232 @@
+
+//ConsultaStatement.java
+
+/*
+
+
+//Ejercicio 1: Añadir las instrucciones necesarias para obtener y mostrar los libros que contengan la palabra ‘Java’.
 package jdbc;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public class ConsultaStatement {
 
 	public static void main(String[] args) {
+		try {
+			// Usamos la cadena de conexión previamente establecia en la clase Conexion.java
+			String url = "jdbc:mysql://localhost:8889/libros?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC";
+			Connection conexion;
+			conexion = DriverManager.getConnection(url, "root", "root");
+			Statement sentenciaSQL = conexion.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.CONCUR_READ_ONLY);
+			String palabraClave = "Java";
+			StringBuffer sb = new StringBuffer();
+			sb.append("SELECT autores.Nombre, libro.Titulo ");
+			sb.append("FROM autorlibro ");
+			sb.append("INNER JOIN autores ON autorlibro.CodAutor = autores.CodigoAutor ");
+			sb.append("INNER JOIN libro ON autorlibro.CodLibro = libro.CodigoLibro ");
+			sb.append("WHERE libro.Titulo LIKE '%").append(palabraClave).append("%'");
+			ResultSet rs = sentenciaSQL.executeQuery(sb.toString());
+			System.out.println("Libros que contienen la palabra '" + palabraClave + "':\n");
+			String nombre;
+			String titulo;
+			rs.beforeFirst();
+			while (rs.next()) {
+				System.out.print("\nAUTOR:  ");
+				nombre = rs.getString("Nombre").toString();
+				System.out.println(nombre);
+				System.out.print("TITULO:  ");
+				titulo = rs.getString("Titulo").toString();
+				System.out.println(titulo);
+				System.out.println("-----------------------");
+			}
+			sentenciaSQL.close();
+			conexion.close();
+		} catch (SQLException e) {
+			System.out.println("SQLException: " + e.getMessage());
+			System.out.println("SQLState: " + e.getSQLState());
+			System.out.println("VendorError: " + e.getErrorCode());
+		}
+	}
+}
 
-		// Creación de una sentencia SQL para obtener todos los libros de un determinado
-		// autor.
-		// Presentación de la información obtenida por pantalla y cierre de la conexión
-		// con la BD.
-		// Podemos crear un proyecto en Eclipse para probar estas clases de ejemplo. Si
-		// no acabamos de entender
-		// cómo funciona el código podríamos ejecutarlo en modo ‘debug’ para
-		// familiarizarnos con su funcionamiento
-		// (aunque esto no es crucial para realizar la práctica).
-		// Cuando ya tengamos claro qué hacen las clases de ejemplo podemos pasar a
-		// realizar los siguientes ejercicios
+*/
 
-		// Usamos la cadena de conexión previamente establecia en la clase Conexion.java
-		String url = "jdbc:mysql://localhost:8889/libros?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC";
-        try {
-            // Establecer la URL de conexión utilizando el método estático de la clase Conexion
-            Conexion.setURL(url);
+/*
 
-            // Obtener la conexión utilizando el método estático de la clase Conexion
-            Connection conexion = Conexion.getConexion();
+//Ejercicio 2…Apartado A:
+package jdbc;
 
-            // Preparar la consulta SQL
-            String librosAutor = "SELECT l.* " +
-                    "FROM libro l " +
-                    "JOIN autorlibro al ON l.CodigoLibro = al.CodLibro " +
-                    "JOIN autores a ON al.CodAutor = a.CodigoAutor " +
-                    "WHERE a.Nombre = ?";
-            PreparedStatement comando = conexion.prepareStatement(librosAutor);
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
+public class ConsultaStatement {
+	
+	private static ResultSet lanzarSelect(String select) {
+		ResultSet rs = null;
+		try {
+			// Usamos la cadena de conexión previamente establecia en la clase Conexion.java
+			String url = "jdbc:mysql://localhost:8889/libros?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC";
+			Connection conexion;
+			conexion = DriverManager.getConnection(url, "root", "root");
+			Statement sentenciaSQL = conexion.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.CONCUR_READ_ONLY);
+			rs = sentenciaSQL.executeQuery(select);
+		} catch (SQLException e) {
+			System.out.println("Error al ejecutar la consulta: " + e.getMessage());
+		}
+		return rs;
+	}
+	
+	private static void mostrarSelect(ResultSet res) {
+	    try {
+	        ResultSetMetaData resMD = res.getMetaData();
+	        int num_cols = resMD.getColumnCount();
 
-            // Establecer el parámetro de la consulta
-            comando.setString(1, "GARY CORNELL");
+	        // Imprimir nombres de las columnas
+	        for (int i = 1; i <= num_cols; i++) {
+	            System.out.print(resMD.getColumnName(i) + "\t");
+	        }
+	        System.out.println();
 
-            // Ejecutar la consulta
-            ResultSet res = comando.executeQuery();
-            while (res.next()) {
-                // Acceder a los valores de las columnas de cada fila, por ejemplo:
-                int codigoLibro = res.getInt("CodigoLibro");
-                String isbn = res.getString("ISBN");
-                // ... y así sucesivamente para cada columna que necesites
-            }
+	        // Imprimir filas
+	        while (res.next()) {
+	            for (int i = 1; i <= num_cols; i++) {
+	                System.out.print(res.getString(i) + "\t");
+	            }
+	            System.out.println();
+	        }
+	    } catch (SQLException e) {
+	        System.out.println("Error al mostrar el ResultSet: " + e.getMessage());
+	    }
+	}
 
-            // Cerrar la conexión y liberar recursos
-            conexion.close();
-        } catch (SQLException e) {
-            // Manejar cualquier excepción que pueda ocurrir durante la conexión o la ejecución de la consulta
-            e.printStackTrace();
-        }
-    }
+	public static void main(String[] args) {
+		try {
+			String palabraClave = "Java";
+			StringBuffer sb = new StringBuffer();
+			sb.append("SELECT autores.Nombre, libro.Titulo ");
+			sb.append("FROM autorlibro ");
+			sb.append("INNER JOIN autores ON autorlibro.CodAutor = autores.CodigoAutor ");
+			sb.append("INNER JOIN libro ON autorlibro.CodLibro = libro.CodigoLibro ");
+			sb.append("WHERE libro.Titulo LIKE '%").append(palabraClave).append("%'");
+			ResultSet rs = lanzarSelect(sb.toString());
+	        System.out.println("Libros que contienen la palabra '" + palabraClave + "':");
+
+	        // Llamar al método mostrarSelect para imprimir los resultados
+	        mostrarSelect(rs);
+
+	        rs.close();
+		} catch (SQLException e) {
+			System.out.println("SQLException: " + e.getMessage());
+			System.out.println("SQLState: " + e.getSQLState());
+			System.out.println("VendorError: " + e.getErrorCode());
+		}
+	}
+}
+
+*/
+
+package jdbc;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+public class ConsultaStatement {
+
+	private static int getNuevoID(String tabla, String ID) throws SQLException {
+		int nuevoID = 0;
+		try {
+			// Construir la consulta para obtener el último ID
+			StringBuilder sb = new StringBuilder("SELECT MAX(").append(ID).append(") FROM ").append(tabla);
+
+			// Ejecutar la consulta y obtener el resultado
+			ResultSet rs = lanzarSelect(sb.toString());
+
+			// Obtener el último ID y calcular el nuevo ID
+			if (rs.next()) {
+				int ultimoID = rs.getInt(1);
+				nuevoID = ultimoID + 1;
+			}
+
+			// Cerrar el ResultSet
+			rs.close();
+		} catch (SQLException e) {
+			System.out.println("Error al obtener el nuevo ID: " + e.getMessage());
+			throw e;
+		}
+		return nuevoID;
+	}
+
+	private static ResultSet lanzarSelect(String select) {
+		ResultSet rs = null;
+		try {
+			// Usamos la cadena de conexión previamente establecia en la clase Conexion.java
+			String url = "jdbc:mysql://localhost:8889/libros?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC";
+			Connection conexion;
+			conexion = DriverManager.getConnection(url, "root", "root");
+			Statement sentenciaSQL = conexion.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.CONCUR_READ_ONLY);
+			rs = sentenciaSQL.executeQuery(select);
+		} catch (SQLException e) {
+			System.out.println("Error al ejecutar la consulta: " + e.getMessage());
+		}
+		return rs;
+	}
+
+	private static void mostrarSelect(ResultSet res) {
+		try {
+			ResultSetMetaData resMD = res.getMetaData();
+			int num_cols = resMD.getColumnCount();
+
+			// Imprimir nombres de las columnas
+			for (int i = 1; i <= num_cols; i++) {
+				System.out.print(resMD.getColumnName(i) + "\t");
+			}
+			System.out.println();
+
+			// Imprimir filas
+			while (res.next()) {
+				for (int i = 1; i <= num_cols; i++) {
+					System.out.print(res.getString(i) + "\t");
+				}
+				System.out.println();
+			}
+		} catch (SQLException e) {
+			System.out.println("Error al mostrar el ResultSet: " + e.getMessage());
+		}
+	}
+
+	public static void main(String[] args) {
+	    try {
+	        String palabraClave = "Java";
+	        ResultSet rs = obtenerLibrosPorPalabraClave(palabraClave);
+	        System.out.println("Libros que contienen la palabra '" + palabraClave + "':");
+	        mostrarSelect(rs);
+	        rs.close();
+
+	        // Obtener el nuevo ID para la tabla autores
+	        String tabla = "autores";
+	        String campoID = "CodigoAutor";
+	        int nuevoID = getNuevoID(tabla, campoID);
+	        System.out.println("Nuevo ID para la tabla " + tabla + ": " + nuevoID);
+
+	    } catch (SQLException e) {
+	        System.out.println("SQLException: " + e.getMessage());
+	        System.out.println("SQLState: " + e.getSQLState());
+	        System.out.println("VendorError: " + e.getErrorCode());
+	    }
+	}
+
 }

@@ -20,7 +20,10 @@ public class PruebasSql {
 		 * "INSERT INTO cli VALUES('30', 'Carlos', 'AndresAgudelo' , 'Medellin', 'Colombia')"
 		 * ;
 		 */
-		String consulta = "SELECT * FROM models";
+		String consulta = "SELECT libros.* \n"
+                + "FROM libros \n"
+                + "JOIN autorlibro ON libros.CodigoLibro = autorlibro.CodLibro \n"
+                + "WHERE autorlibro.CodAutor = ?";
 
 		Connection conexion = DriverManager.getConnection(URL, "postgres", "1111");
 		Statement comando = conexion.createStatement();
