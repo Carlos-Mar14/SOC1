@@ -145,30 +145,6 @@ import java.sql.Statement;
 
 public class ConsultaStatement {
 
-	private static int getNuevoID(String tabla, String ID) throws SQLException {
-		int nuevoID = 0;
-		try {
-			// Construir la consulta para obtener el último ID
-			StringBuilder sb = new StringBuilder("SELECT MAX(").append(ID).append(") FROM ").append(tabla);
-
-			// Ejecutar la consulta y obtener el resultado
-			ResultSet rs = lanzarSelect(sb.toString());
-
-			// Obtener el último ID y calcular el nuevo ID
-			if (rs.next()) {
-				int ultimoID = rs.getInt(1);
-				nuevoID = ultimoID + 1;
-			}
-
-			// Cerrar el ResultSet
-			rs.close();
-		} catch (SQLException e) {
-			System.out.println("Error al obtener el nuevo ID: " + e.getMessage());
-			throw e;
-		}
-		return nuevoID;
-	}
-
 	private static ResultSet lanzarSelect(String select) {
 		ResultSet rs = null;
 		try {
@@ -208,25 +184,63 @@ public class ConsultaStatement {
 		}
 	}
 
-	public static void main(String[] args) {
-	    try {
-	        String palabraClave = "Java";
-	        ResultSet rs = obtenerLibrosPorPalabraClave(palabraClave);
-	        System.out.println("Libros que contienen la palabra '" + palabraClave + "':");
-	        mostrarSelect(rs);
-	        rs.close();
-
-	        // Obtener el nuevo ID para la tabla autores
-	        String tabla = "autores";
-	        String campoID = "CodigoAutor";
-	        int nuevoID = getNuevoID(tabla, campoID);
-	        System.out.println("Nuevo ID para la tabla " + tabla + ": " + nuevoID);
-
-	    } catch (SQLException e) {
-	        System.out.println("SQLException: " + e.getMessage());
-	        System.out.println("SQLState: " + e.getSQLState());
-	        System.out.println("VendorError: " + e.getErrorCode());
-	    }
+	private static int getNuevoID(String tabla, String ID) throws SQLException {
+		int nuevoID = 0;
+		try {
+			StringBuilder sb = new StringBuilder("SELECT MAX(").append(ID).append(") FROM ").append(tabla);
+			ResultSet rs = lanzarSelect(sb.toString());
+			if (rs.next()) {
+				int ultimoID = rs.getInt(1);
+				nuevoID = ultimoID + 1;
+			}
+			rs.close();
+		} catch (SQLException e) {
+			System.out.println("Error al obtener el nuevo ID: " + e.getMessage());
+			throw e;
+		}
+		return nuevoID + 1;
 	}
 
+	private static int gravarFila(String sql) throws SQLException {
+		Conexion.setURL("jdbc:mysql://localhost:8889/libros?user=root&password=root");
+		return Conexion.getConexion().createStatement().executeUpdate(sql);
+
+	}
+
+	public static void main(String[] args) {
+		try {
+			StringBuilder sb = new StringBuilder();
+			String codigo = "Java";
+			String insert = "INSERT INTO `autores` (`CodigoAutor`, `Nombre`, `Direccion`, `Telefono`) VALUES ('"
+					+ getNuevoID("autores", "codigoautor")
+					+ "', 'CARLOS', 'calle Fortuny', '33333333');";
+			String update = "UPDATE libro set Fecha = CURRENT_DATE where CodigoLibro = 3;";
+			String palabraClave = "Java";
+			
+			sb.append("SELECT autores.Nombre, libro.Titulo ");
+			sb.append("FROM autorlibro ");
+			sb.append("INNER JOIN autores ON autorlibro.CodAutor = autores.CodigoAutor ");
+			sb.append("INNER JOIN libro ON autorlibro.CodLibro = libro.CodigoLibro ");
+			sb.append("WHERE libro.Titulo LIKE '%").append(palabraClave).append("%'");
+			ResultSet rs = lanzarSelect(sb.toString());
+			mostrarSelect(rs);
+			System.out.println("Libros que contienen la palabra '" + palabraClave + "':");
+
+			System.out.println(sb.toString());
+
+			ResultSet res = lanzarSelect(sb.toString());
+			mostrarSelect(res);
+
+			System.out.println(getNuevoID("Autores", "CodigoAutor"));
+			System.out.println("Insert: " + insert);
+			System.out.println(gravarFila(insert));
+			System.out.println(gravarFila(update));
+			System.out.println(update);
+			rs.close();
+		} catch (SQLException e) {
+			System.out.println("SQLException: " + e.getMessage());
+			System.out.println("SQLState: " + e.getSQLState());
+			System.out.println("VendorError: " + e.getErrorCode());
+		}
+	}
 }
