@@ -16,6 +16,7 @@ public class Pila {
 			ejecutar(pila);
 
 		}
+
 	}
 
 	private static void ejecutar(Stack<String> pila) {
@@ -36,4 +37,6 @@ public class Pila {
 			break;
 				}
 	
+}
+}
 }
